@@ -19,8 +19,9 @@
                          (apply hash-map line))
                        purchases)
         purchases (w/keywordize-keys purchases)
+        input (read-line)
         purchases (filter (fn [line]
-                            (= "Furniture" (:category line)))
+                            (= input (:category line)))
                           purchases)]
     (spit "filtered_purchases.edu"
           (pr-str purchases))))
