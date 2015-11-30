@@ -1,10 +1,11 @@
 (ns purchases-clojure.core
   (:require [clojure.string :as s]
             [clojure.walk :as w]
-            [clojure.pprint :as pp])
+            [ring.adapter.jetty :as j]
+            [hiccup.core :as h])
   (:gen-class))
 
-(defn -main [& args]
+(defn purchases-html []
   (println "Type a category and hit enter.")
   (let [purchases (slurp "purchases.csv")
         purchases (s/split-lines purchases)
@@ -25,4 +26,18 @@
                             (= input (:category line)))
                           purchases)]
     (spit "filtered_purchases.edu"
-          (with-out-str (pp/pp-newline purchases)))))
+          (pr-str purchases))
+    purchases))
+
+(defn handler [request]
+  {:status  200
+   :headers {"Content-Type" "text/html"}
+   :body    (h/html [:html
+                     [:body
+                      [:a {:href "http://reddit.com"}
+                       "Reddit"]
+                      [:br]
+                      (purchases-html)]])})
+
+(defn -main [& args]
+  (j/run-jetty #'handler {:port 3000 :join? false}))
